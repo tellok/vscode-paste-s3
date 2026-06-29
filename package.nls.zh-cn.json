@@ -63,5 +63,6 @@
   "configuration.undoLimit.description": "可以执行的撤销上传的最大数量。设置为 0 以禁用撤销功能。",
   "configuration.mimeTypeFilter.description": "匹配应上传的 MIME 类型的正则表达式，例如，`image/.*` 将仅上传图像。留空以上传任何 MIME 类型。请注意，文本文件的 MIME 类型无法可靠检测，如果检测失败，将被视为 `application/octet-stream`。",
   "configuration.ignoreWorkspaceFiles.description": "上传文件时忽略工作区中已存在的文件。其他扩展（如内置的 Markdown 扩展）可能会处理这些文件。",
-  "configuration.retrieveOriginalImage.description": "粘贴时是否尝试从剪贴板下载原始图像。这对于从 Microsoft Edge 等浏览器粘贴动画图像很有用，这些浏览器仅在剪贴板中提供静态图像。"
+  "configuration.retrieveOriginalImage.description": "粘贴时是否尝试从剪贴板下载原始图像。这对于从 Microsoft Edge 等浏览器粘贴动画图像很有用，这些浏览器仅在剪贴板中提供静态图像。",
+  "configuration.convertHeicToPng.description": "上传前将粘贴或拖放的 HEIC/HEIF 图片转换为 PNG。其他图片格式保持原样上传。使用随扩展安装的 Node.js 转换器，不依赖操作系统自带的图片转换工具。"
 }

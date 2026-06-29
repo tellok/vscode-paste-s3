@@ -63,5 +63,6 @@
   "configuration.undoLimit.description": "The maximum number of undo uploads that can be performed. Set to 0 to disable the undo feature.",
   "configuration.mimeTypeFilter.description": "A regular expression that matches the MIME types that should be uploaded, for example, `image/.*` will only upload images. Leave empty to upload any MIME type. Note that the MIME type of text files is not reliably detected, and will be treated as `application/octet-stream` if the detection fails.",
   "configuration.ignoreWorkspaceFiles.description": "Ignore files that are already in the workspace when uploading files. Other extensions like the built-in Markdown extension may handle these files.",
-  "configuration.retrieveOriginalImage.description": "Whether to try to download the original image from the clipboard when pasting. This is useful for pasting animated images from browsers like Microsoft Edge, which only provide a static image in the clipboard."
+  "configuration.retrieveOriginalImage.description": "Whether to try to download the original image from the clipboard when pasting. This is useful for pasting animated images from browsers like Microsoft Edge, which only provide a static image in the clipboard.",
+  "configuration.convertHeicToPng.description": "Convert pasted or dropped HEIC/HEIF images to PNG before uploading. Other image formats are uploaded unchanged. Uses a bundled Node.js converter and does not rely on OS image conversion tools."
 }

@@ -31,6 +31,7 @@ export interface ResourceFileLoaderOptions {
     mimeTypeFilter: string;
     ignoreWorkspaceFiles: boolean;
     retrieveOriginalImage: boolean;
+    convertHeicToPng: boolean;
 }
 
 export interface ResourceUploadResult {

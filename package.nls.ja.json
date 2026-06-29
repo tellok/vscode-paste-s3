@@ -52,5 +52,6 @@
   "configuration.undoLimit.description": "実行可能な元に戻す（アップロード取り消し）操作の最大回数。0に設定すると元に戻す機能を無効にします。",
   "configuration.mimeTypeFilter.description": "アップロードすべきMIMEタイプに一致する正規表現。例えば、`image/.*`は画像のみをアップロードします。空のままにすると任意のMIMEタイプをアップロードします。テキストファイルのMIMEタイプは確実に検出されない場合があり、検出に失敗した場合は`application/octet-stream`として扱われることに注意してください。",
   "configuration.ignoreWorkspaceFiles.description": "ファイルをアップロードする際、すでにワークスペースにあるファイルを無視します。組み込みのMarkdown拡張機能のような他の拡張機能がこれらのファイルを処理する場合があります。",
-  "configuration.retrieveOriginalImage.description": "貼り付け時にクリップボードから元の画像をダウンロードしようとするかどうか。これは、Microsoft Edgeのようにクリップボードに静止画像しか提供しないブラウザからアニメーション画像を貼り付ける場合に便利です。"
+  "configuration.retrieveOriginalImage.description": "貼り付け時にクリップボードから元の画像をダウンロードしようとするかどうか。これは、Microsoft Edgeのようにクリップボードに静止画像しか提供しないブラウザからアニメーション画像を貼り付ける場合に便利です。",
+  "configuration.convertHeicToPng.description": "貼り付けまたはドロップされた HEIC/HEIF 画像をアップロード前に PNG に変換します。その他の画像形式は変更せずにアップロードします。拡張機能に同梱された Node.js 変換器を使用し、OS の画像変換ツールには依存しません。"
 }

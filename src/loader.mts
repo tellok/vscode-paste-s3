@@ -25,7 +25,8 @@ export class ResourceFileLoader {
             allowMultipleFiles: languageOptions.get<AllowMultipleFiles>('allowMultipleFiles')!,
             mimeTypeFilter: languageOptions.get<string>('mimeTypeFilter')!,
             ignoreWorkspaceFiles: languageOptions.get<boolean>('ignoreWorkspaceFiles')!,
-            retrieveOriginalImage: languageOptions.get<boolean>('retrieveOriginalImage')!
+            retrieveOriginalImage: languageOptions.get<boolean>('retrieveOriginalImage')!,
+            convertHeicToPng: languageOptions.get<boolean>('convertHeicToPng')!
         };
         const logger = getLogger();
         logger.info(`ResourceFileLoader initialized for language ${languageId} with options: ${JSON.stringify(this.options)}`);
@@ -33,6 +34,50 @@ export class ResourceFileLoader {
 
     public getUploadDestination(): UploadDestination {
         return this.options.uploadDestination;
+    }
+
+    private isHeicOrHeif(file: ResourceFile): boolean {
+        return file.mime === 'image/heic' ||
+            file.mime === 'image/heif' ||
+            file.mime === 'image/heic-sequence' ||
+            file.mime === 'image/heif-sequence';
+    }
+
+    private async convertHeicFileToPng(file: ResourceFile): Promise<ResourceFile | undefined> {
+        if (!this.options.convertHeicToPng || !this.isHeicOrHeif(file)) {
+            return file;
+        }
+
+        const logger = getLogger();
+        try {
+            const { default: heicConvert } = await import('heic-convert');
+            const data = await heicConvert({
+                buffer: file.data,
+                format: 'PNG'
+            });
+            logger.info(`Converted ${file.name}.${file.extension} from ${file.mime} to image/png using HEIC converter`);
+            return {
+                ...file,
+                mime: 'image/png',
+                extension: 'png',
+                data: Buffer.from(data)
+            };
+        } catch (error) {
+            logger.error(`Failed to convert ${file.name}.${file.extension} from ${file.mime} to PNG`, error);
+            vscode.window.showErrorMessage(`Failed to convert ${file.name}.${file.extension} to PNG: ${error}`);
+            return undefined;
+        }
+    }
+
+    private async convertHeicFilesToPng(files: ResourceFile[]): Promise<ResourceFile[]> {
+        let converted: ResourceFile[] = [];
+        for (const file of files) {
+            const convertedFile = await this.convertHeicFileToPng(file);
+            if (convertedFile) {
+                converted.push(convertedFile);
+            }
+        }
+        return converted;
     }
 
     private async loadDataTransferAttachments(dataTransfer: vscode.DataTransfer): Promise<IncompleteResourceFile[]> {
@@ -227,6 +272,9 @@ export class ResourceFileLoader {
         if (this.options.retrieveOriginalImage) {
             result = await this.tryRetrieveOriginalImage(dataTransfer, result);
         }
+
+        // Convert HEIC/HEIF after retrieving originals so the uploaded file metadata matches the final data.
+        result = await this.convertHeicFilesToPng(result);
 
         // Check against file size limit
         let totalSize = _.sumBy(result, i => i.data.length);

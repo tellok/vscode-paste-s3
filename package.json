@@ -264,6 +264,13 @@
           "default": true,
           "markdownDescription": "%configuration.retrieveOriginalImage.description%",
           "order": 7
+        },
+        "pasteS3.convertHeicToPng": {
+          "type": "boolean",
+          "default": true,
+          "scope": "language-overridable",
+          "markdownDescription": "%configuration.convertHeicToPng.description%",
+          "order": 8
         }
       }
     },
@@ -319,5 +326,8 @@
     "uuid": "^11.0.5",
     "vite": "^7.3.1"
   },
-  "packageManager": "pnpm@9.15.2"
+  "packageManager": "pnpm@9.15.2",
+  "dependencies": {
+    "heic-convert": "^2.1.0"
+  }
 }

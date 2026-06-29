@@ -52,5 +52,6 @@
   "configuration.undoLimit.description": "수행할 수 있는 최대 업로드 실행 취소 횟수입니다. 실행 취소 기능을 비활성화하려면 0으로 설정하세요.",
   "configuration.mimeTypeFilter.description": "업로드할 MIME 유형과 일치하는 정규식입니다. 예를 들어 `image/.*`는 이미지만 업로드합니다. 모든 MIME 유형을 업로드하려면 비워 두세요. 텍스트 파일의 MIME 유형은 안정적으로 감지되지 않으며, 감지에 실패하면 `application/octet-stream`으로 처리됩니다.",
   "configuration.ignoreWorkspaceFiles.description": "파일 업로드 시 이미 작업 영역에 있는 파일은 무시합니다. 내장 Markdown 확장 프로그램과 같은 다른 확장 프로그램이 이러한 파일을 처리할 수 있습니다.",
-  "configuration.retrieveOriginalImage.description": "붙여넣기 시 클립보드에서 원본 이미지 다운로드를 시도할지 여부입니다. 이는 클립보드에 정적 이미지만 제공하는 Microsoft Edge와 같은 브라우저에서 애니메이션 이미지를 붙여넣을 때 유용합니다."
+  "configuration.retrieveOriginalImage.description": "붙여넣기 시 클립보드에서 원본 이미지 다운로드를 시도할지 여부입니다. 이는 클립보드에 정적 이미지만 제공하는 Microsoft Edge와 같은 브라우저에서 애니메이션 이미지를 붙여넣을 때 유용합니다.",
+  "configuration.convertHeicToPng.description": "붙여넣거나 드롭한 HEIC/HEIF 이미지를 업로드하기 전에 PNG로 변환합니다. 다른 이미지 형식은 변경하지 않고 업로드합니다. 확장에 포함된 Node.js 변환기를 사용하며 OS 이미지 변환 도구에 의존하지 않습니다."
 }

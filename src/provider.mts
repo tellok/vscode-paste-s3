@@ -67,7 +67,8 @@ export class ResourcePasteOrDropProvider implements vscode.DocumentPasteEditProv
             undoLimit: config.get('undoLimit'),
             mimeTypeFilter: config.get('mimeTypeFilter'),
             ignoreWorkspaceFiles: config.get('ignoreWorkspaceFiles'),
-            retrieveOriginalImage: config.get('retrieveOriginalImage')
+            retrieveOriginalImage: config.get('retrieveOriginalImage'),
+            convertHeicToPng: config.get('convertHeicToPng')
         };
         logger.info(`Effective Configuration: ${JSON.stringify(dump)}`);
     }

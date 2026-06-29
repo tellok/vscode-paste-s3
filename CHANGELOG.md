@@ -1,5 +1,16 @@
 # Change Log
 
+## 0.2.0
+
+### Minor Changes
+
+- ffe820b: feat: add optional cross-platform HEIC/HEIF to PNG conversion
+- 06a2071: feat: insert Markdown image links with original image names as alt text
+
+### Patch Changes
+
+- 199c7d9: fix: only handle paste and drop events in visible text editors
+
 ## 0.1.1
 
 ### Patch Changes

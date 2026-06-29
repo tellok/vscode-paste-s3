@@ -95,6 +95,24 @@ export class ResourcePasteOrDropProvider implements vscode.DocumentPasteEditProv
         return this.uploaders[key];
     }
 
+    private isTextEditorDocument(document: vscode.TextDocument): boolean {
+        const uri = document.uri.toString();
+        const activeEditor = vscode.window.activeTextEditor;
+
+        if (activeEditor?.document.uri.toString() !== uri) {
+            return false;
+        }
+
+        if (activeEditor.viewColumn === undefined) {
+            return false;
+        }
+
+        return vscode.window.visibleTextEditors.some(editor =>
+            editor.viewColumn !== undefined &&
+            editor.document.uri.toString() === uri
+        );
+    }
+
     public async provideDocumentDropEdits(
         document: vscode.TextDocument,
         position: vscode.Position,
@@ -103,6 +121,10 @@ export class ResourcePasteOrDropProvider implements vscode.DocumentPasteEditProv
     ): Promise<ResourceUploadDocumentDropEdit[] | undefined> {
         const logger = getLogger();
         logger.debug('provideDocumentDropEdits called for', document.languageId);
+        if (!this.isTextEditorDocument(document)) {
+            logger.debug(`Skipping drop outside a visible text editor: ${document.uri.toString()}`);
+            return undefined;
+        }
         inspectDataTransfer(dataTransfer);
         const loader = this.getLoader(document.languageId);
         const files = await loader.prepareFilesToUpload(dataTransfer);
@@ -125,6 +147,10 @@ export class ResourcePasteOrDropProvider implements vscode.DocumentPasteEditProv
     ): Promise<ResourceUploadDocumentPasteEdit[] | undefined> {
         const logger = getLogger();
         logger.debug('provideDocumentPasteEdits called for', document.languageId);
+        if (!this.isTextEditorDocument(document)) {
+            logger.debug(`Skipping paste outside a visible text editor: ${document.uri.toString()}`);
+            return undefined;
+        }
         inspectDataTransfer(dataTransfer);
         const loader = this.getLoader(document.languageId);
         const files = await loader.prepareFilesToUpload(dataTransfer);

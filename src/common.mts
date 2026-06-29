@@ -5,6 +5,8 @@ export interface ResourceFile {
     name: string;
     extension: string;
     data: Buffer;
+    originalName?: string;
+    originalExtension?: string;
 }
 
 export interface IncompleteResourceFile {

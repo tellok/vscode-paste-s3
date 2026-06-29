@@ -126,6 +126,8 @@ export class ResourceFileLoader {
     }
 
     private async completeResourceFile(file: IncompleteResourceFile): Promise<ResourceFile | undefined> {
+        const originalName = file.name;
+        const originalExtension = file.extension;
         let name = file.name;
         if (_.isEmpty(name) || name === 'image' || !this.options.keepOriginalFilename) {
             name = await generateFileName(this.options.fileNamingMethod, file);
@@ -165,7 +167,9 @@ export class ResourceFileLoader {
             mime: mime!,
             name: name!,
             extension: extension!,
-            data: file.data
+            data: file.data,
+            originalName,
+            originalExtension
         };
     }
 
@@ -292,7 +296,22 @@ export class ResourceFileLoader {
         return result;
     }
 
+    private getOriginalFilename(file: ResourceFile): string {
+        if (_.isEmpty(file.originalName)) {
+            return _.isEmpty(file.extension) ? file.name : `${file.name}.${file.extension}`;
+        }
+        return _.isEmpty(file.originalExtension) ? file.originalName! : `${file.originalName}.${file.originalExtension}`;
+    }
+
+    private escapeMarkdownAltText(text: string): string {
+        return text.replace(/\\/g, '\\\\').replace(/\]/g, '\\]');
+    }
+
     public generateSnippet(file: ResourceFile, url: string): string {
+        if (this.languageId === 'markdown' && file.mime.startsWith('image/')) {
+            return `![${this.escapeMarkdownAltText(this.getOriginalFilename(file))}](${url})`;
+        }
+
         let snippet = file.mime.startsWith('image/') ? this.options.imageSnippet : this.options.defaultSnippet;
         snippet = snippet.replace("${url}", url);
         snippet = snippet.replace("${filename}", _.isEmpty(file.extension) ? file.name : `${file.name}.${file.extension}`);

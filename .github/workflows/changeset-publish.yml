@@ -3,105 +3,113 @@ name: Changeset Release
 on:
   push:
     branches:
-      - master
+    - master
     paths:
-      - 'package.json'
+    - 'package.json'
 
 jobs:
   check-version:
-    runs-on: ubuntu-latest
+    runs-on:
+    - self-hosted
+    - tower
+    - ubuntu-latest
+    - tower-run-${{ github.run_id }}-${{ github.run_attempt }}
     outputs:
       version-changed: ${{ steps.check-version.outputs.changed }}
       new-version: ${{ steps.check-version.outputs.version }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 2
 
-      - name: Check if version changed
-        id: check-version
-        run: |
-          # Get the current version from package.json
-          CURRENT_VERSION=$(node -p "require('./package.json').version")
-          echo "Current version: $CURRENT_VERSION"
+    - name: Check if version changed
+      id: check-version
+      run: |
+        # Get the current version from package.json
+        CURRENT_VERSION=$(node -p "require('./package.json').version")
+        echo "Current version: $CURRENT_VERSION"
 
-          # Get the previous version from package.json using git show
-          if PREV_CONTENT=$(git show HEAD~1:package.json 2>/dev/null); then
-            PREVIOUS_VERSION=$(echo "$PREV_CONTENT" | node -e "const data = require('fs').readFileSync(0, 'utf-8'); console.log(JSON.parse(data).version)")
-            echo "Previous version: $PREVIOUS_VERSION"
-          else
-            echo "First commit, no previous version"
-            PREVIOUS_VERSION="0.0.0"
-          fi
+        # Get the previous version from package.json using git show
+        if PREV_CONTENT=$(git show HEAD~1:package.json 2>/dev/null); then
+          PREVIOUS_VERSION=$(echo "$PREV_CONTENT" | node -e "const data = require('fs').readFileSync(0, 'utf-8'); console.log(JSON.parse(data).version)")
+          echo "Previous version: $PREVIOUS_VERSION"
+        else
+          echo "First commit, no previous version"
+          PREVIOUS_VERSION="0.0.0"
+        fi
 
-          # Compare versions
-          if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
-            echo "Version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
-            echo "changed=true" >> $GITHUB_OUTPUT
-            echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
-          else
-            echo "Version unchanged"
-            echo "changed=false" >> $GITHUB_OUTPUT
-            echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
-          fi
+        # Compare versions
+        if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
+          echo "Version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
+          echo "changed=true" >> $GITHUB_OUTPUT
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+        else
+          echo "Version unchanged"
+          echo "changed=false" >> $GITHUB_OUTPUT
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+        fi
 
   publish:
     needs: check-version
     if: needs.check-version.outputs.version-changed == 'true'
-    runs-on: ubuntu-latest
+    runs-on:
+    - self-hosted
+    - tower
+    - ubuntu-latest
+    - tower-run-${{ github.run_id }}-${{ github.run_attempt }}
     permissions:
       contents: write
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9.15.2
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 9.15.2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.x'
-          cache: 'pnpm'
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'pnpm'
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
 
-      - name: Run tests
-        run: xvfb-run -a pnpm test
+    - name: Run tests
+      run: xvfb-run -a pnpm test
 
-      - name: Run linter
-        run: pnpm run lint
+    - name: Run linter
+      run: pnpm run lint
 
-      - name: Build extension
-        run: pnpm run package
+    - name: Build extension
+      run: pnpm run package
 
-      - name: Package extension
-        run: pnpm vsce package --no-dependencies
+    - name: Package extension
+      run: pnpm vsce package --no-dependencies
 
-      - name: Publish to VSCode Marketplace
-        run: pnpm vsce publish --packagePath *.vsix -p ${{ secrets.VSCE_TOKEN }}
+    - name: Publish to VSCode Marketplace
+      run: pnpm vsce publish --packagePath *.vsix -p ${{ secrets.VSCE_TOKEN }}
 
-      - name: Publish to Open VSX Registry
-        run: npx ovsx publish -p ${{ secrets.OVSX_TOKEN }} *.vsix
-        continue-on-error: true
+    - name: Publish to Open VSX Registry
+      run: npx ovsx publish -p ${{ secrets.OVSX_TOKEN }} *.vsix
+      continue-on-error: true
 
-      - name: Upload VSIX as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: vscode-extension-vsix-v${{ needs.check-version.outputs.new-version }}
-          path: '*.vsix'
-          retention-days: 90
+    - name: Upload VSIX as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: vscode-extension-vsix-v${{ needs.check-version.outputs.new-version }}
+        path: '*.vsix'
+        retention-days: 90
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ needs.check-version.outputs.new-version }}
-          name: v${{ needs.check-version.outputs.new-version }}
-          generate_release_notes: true
-          files: '*.vsix'
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: v${{ needs.check-version.outputs.new-version }}
+        name: v${{ needs.check-version.outputs.new-version }}
+        generate_release_notes: true
+        files: '*.vsix'

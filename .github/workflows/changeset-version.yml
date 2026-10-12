@@ -3,50 +3,54 @@ name: Changeset Version
 on:
   push:
     branches:
-      - master
+    - master
     paths:
-      - '.changeset/*.md'
+    - '.changeset/*.md'
   workflow_dispatch:
 
 jobs:
   version:
-    runs-on: ubuntu-latest
+    runs-on:
+    - self-hosted
+    - tower
+    - ubuntu-latest
+    - tower-run-${{ github.run_id }}-${{ github.run_attempt }}
     permissions:
       contents: write
       pull-requests: write
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9.15.2
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 9.15.2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.x'
-          cache: 'pnpm'
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'pnpm'
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
 
-      - name: Create Release PR
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          version: pnpm changeset version
-          commit: 'chore: version packages'
-          title: 'chore: version packages'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create Release PR
+      id: changesets
+      uses: changesets/action@v1
+      with:
+        version: pnpm changeset version
+        commit: 'chore: version packages'
+        title: 'chore: version packages'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Assign PR to actor
-        if: steps.changesets.outputs.pullRequestNumber
-        run: gh pr edit ${{ steps.changesets.outputs.pullRequestNumber }} --add-assignee ${{ github.actor }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Assign PR to actor
+      if: steps.changesets.outputs.pullRequestNumber
+      run: gh pr edit ${{ steps.changesets.outputs.pullRequestNumber }} --add-assignee ${{ github.actor }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

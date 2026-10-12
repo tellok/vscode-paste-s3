@@ -8,42 +8,46 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on:
+    - self-hosted
+    - tower
+    - ubuntu-latest
+    - tower-run-${{ github.run_id }}-${{ github.run_attempt }}
     permissions:
       contents: read
-    
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9.15.2
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 9.15.2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.x'
-          cache: 'pnpm'
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'pnpm'
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
 
-      - name: Run linter
-        run: pnpm run lint
+    - name: Run linter
+      run: pnpm run lint
 
-      - name: Build extension
-        run: pnpm run package
+    - name: Build extension
+      run: pnpm run package
 
-      - name: Run tests
-        run: xvfb-run -a pnpm test
+    - name: Run tests
+      run: xvfb-run -a pnpm test
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: vscode-extension
-          path: |
-            dist/
-            package.json
-          retention-days: 7
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: vscode-extension
+        path: |
+          dist/
+          package.json
+        retention-days: 7

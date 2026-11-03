@@ -9,11 +9,7 @@ on:
 
 jobs:
   check-version:
-    runs-on:
-    - self-hosted
-    - tower
-    - ubuntu-latest
-    - tower-run-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on: ["self-hosted", "ubuntu-latest"]
     outputs:
       version-changed: ${{ steps.check-version.outputs.changed }}
       new-version: ${{ steps.check-version.outputs.version }}
@@ -54,11 +50,7 @@ jobs:
   publish:
     needs: check-version
     if: needs.check-version.outputs.version-changed == 'true'
-    runs-on:
-    - self-hosted
-    - tower
-    - ubuntu-latest
-    - tower-run-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on: ["self-hosted", "ubuntu-latest"]
     permissions:
       contents: write
 

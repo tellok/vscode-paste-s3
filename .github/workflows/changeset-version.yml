@@ -10,11 +10,7 @@ on:
 
 jobs:
   version:
-    runs-on:
-    - self-hosted
-    - tower
-    - ubuntu-latest
-    - tower-run-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on: ["self-hosted", "ubuntu-latest"]
     permissions:
       contents: write
       pull-requests: write
